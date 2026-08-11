@@ -5,6 +5,8 @@ use xPDO;
 use modX;
 use xPDOCacheManager;
 use modResource;
+use modContentType;
+use modResourceGroupResource;
 use Zoomx\DTO\Error as ErrorData;
 
 abstract class RequestHandler
@@ -57,14 +59,14 @@ abstract class RequestHandler
                 $resource->_content = $cachedResource['resource']['_content'];
 //                $resource->_isForward = $isForward;
                 if (isset($cachedResource['contentType'])) {
-                    $contentType = $this->modx->newObject('modContentType');
+                    $contentType = $this->modx->newObject(modContentType::class);
                     $contentType->fromArray($cachedResource['contentType'], '', true, true, true);
                     $resource->addOne($contentType, 'ContentType');
                 }
                 if (isset($cachedResource['resourceGroups'])) {
                     $rGroups = [];
                     foreach ($cachedResource['resourceGroups'] as $rGroupKey => $rGroup) {
-                        $rGroups[$rGroupKey]= $this->modx->newObject('modResourceGroupResource', $rGroup);
+                        $rGroups[$rGroupKey]= $this->modx->newObject(modResourceGroupResource::class, $rGroup);
                     }
                     $resource->addMany($rGroups);
                 }
@@ -132,13 +134,13 @@ abstract class RequestHandler
             if ($this->resource && $this->resource instanceof modResource) {
                 $resource = $this->resource;
             } else {
-                $criteria = $this->modx->newQuery('modResource');
-                $criteria->select([$this->modx->escape('modResource') . '.*']);
+                $criteria = $this->modx->newQuery(modResource::class);
+                $criteria->select([$this->modx->escape(modResource::class) . '.*']);
                 $criteria->where(['id' => $resourceId, 'deleted' => '0']);
                 if ($this->modx->getSessionState() !== modX::SESSION_STATE_INITIALIZED || !$this->modx->hasPermission('view_unpublished')) {
                     $criteria->where(['published' => 1]);
                 }
-                $resource = $this->modx->getObject('modResource', $criteria);
+                $resource = $this->modx->getObject(modResource::class, $criteria);
             }
             if ($resource) {
                 if ($this->isWrongResourceContext($resource, $options)) {
