@@ -4,6 +4,7 @@ namespace Zoomx;
 use modX;
 use modRequest;
 use Zoomx\DTO\Error as ErrorData;
+use xPDO;
 
 
 class Request extends modRequest
@@ -65,7 +66,7 @@ class Request extends modRequest
             } else {
                 header($_SERVER['SERVER_PROTOCOL'] . ' 503 Service Unavailable');
                 if (!$this->modx->resourceIdentifier = $this->modx->getOption('site_unavailable_page', null, 1)) {
-                    $this->modx->resource = $this->modx->newObject('modDocument');
+                    $this->modx->resource = $this->modx->newObject(\modDocument::class);
                     $this->modx->resource->template = 0;
                     $this->modx->resource->content = $this->modx->getOption('site_unavailable_message');
                     $this->modx->resourceIdentifier = 0;
@@ -86,7 +87,7 @@ class Request extends modRequest
 
         // If the resource should not be loaded.
         if ($this->hasRoute() && !$this->modx->getOption('zoomx_autoload_resource', null, true)) {
-            $this->modx->resource = $this->modx->newObject('modDocument', ['content_type' => 0]);
+            $this->modx->resource = $this->modx->newObject(\modDocument::class, ['content_type' => 0]);
         } elseif (!$this->isApiMode() && !is_object($this->modx->resource)) {
             $this->modx->resource = $this->getResource('', $this->modx->resourceIdentifier);
             if ($this->modx->resource === null) {
