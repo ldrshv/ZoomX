@@ -4,6 +4,7 @@ namespace Zoomx;
 use Error;
 use MODX\Revolution\modResource;
 use MODX\Revolution\modResponse;
+use MODX\Revolution\modX;
 use Zoomx\DTO\Error as ErrorData;
 use Zoomx\Exceptions\HttpException;
 use Zoomx\Exceptions\NotFoundHttpException;
@@ -128,7 +129,7 @@ class AliasRequestHandler extends RequestHandler
             if (!$resourceId) {
                 $criteria = $this->modx->newQuery(modResource::class);
                 $criteria->where(['uri' => $uri, 'context_key' => $context, 'deleted' => 0]);
-                if ($this->modx->getSessionState() !== \modX::SESSION_STATE_INITIALIZED || !$this->modx->hasPermission('view_unpublished')) {
+                if ($this->modx->getSessionState() !== modX::SESSION_STATE_INITIALIZED || !$this->modx->hasPermission('view_unpublished')) {
                     $criteria->where(['published' => 1]);
                 }
                 $this->resource = $this->modx->getObject(modResource::class, $criteria);

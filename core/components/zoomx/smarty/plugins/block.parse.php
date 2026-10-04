@@ -21,7 +21,7 @@ function smarty_block_parse($params, $content, Smarty_Internal_Template $templat
             $parser = parserx();
         }
 
-        if ($parser instanceof modParser) {
+        if ($parser instanceof \MODX\Revolution\modParser) {
             $maxIterations = $params['iteration'] ?? $modx->getOption('parser_max_iterations', null, 10);
             $parser->processElementTags('', $content, false, false, '[[', ']]', [], (int)$maxIterations);
             $parser->processElementTags('', $content, true, true, '[[', ']]', [], (int)$maxIterations);

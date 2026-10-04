@@ -31,13 +31,16 @@ function smarty_modifier_userinfo($id, $field = null)
         return '';
     }
 
-    $appEnv = getenv('APP_ENV', true) ?? 'prod';
-    $user = $appEnv === 'test' ? $modx->user : $user = $modx->getObjectGraph('\MODX\Revolution\modUser', '{"Profile":{}}', ['\MODX\Revolution\modUser.id' => (int)$id]);
+    $appEnv = getenv('APP_ENV', true) ?: 'prod';
+    // MODX 3: xPDO::getObjectGraph() was removed, using getObject + getOne instead
+    $user = $appEnv === 'test' ? $modx->user : $modx->getObject(\MODX\Revolution\modUser::class, ['id' => (int)$id]);
     if (!$user) {
         return '';
     }
 
-    $userData = array_diff_key(array_merge($user->toArray(), $user->Profile->toArray()), array_flip($excluded));
+    /** @var \MODX\Revolution\modUserProfile $profile */
+    $profile = $user->getOne('Profile') ?: $modx->newObject(\MODX\Revolution\modUserProfile::class);
+    $userData = array_diff_key(array_merge($user->toArray(), $profile->toArray()), array_flip($excluded));
     if (!empty($field)) {
         if (strpos($field, 'extended.') === 0) {
             $result = modifier_userinfo_extended($field, $userData);

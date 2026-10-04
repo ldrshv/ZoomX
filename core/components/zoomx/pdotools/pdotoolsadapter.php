@@ -21,7 +21,7 @@ trait pdoToolsAdapter
         if (!empty($name)) {
             $data = $this->_loadElement($name, 'modChunk', $properties);
         }
-        if (empty($name) || empty($data) || !($data['object'] instanceof modElement)) {
+        if (empty($name) || empty($data) || !($data['object'] instanceof \MODX\Revolution\modElement)) {
             return !empty($properties)
                 ? str_replace(array('[', ']', '`'), array('&#91;', '&#93;', '&#96;'),
                               htmlentities(print_r($properties, true), ENT_QUOTES, 'UTF-8'))

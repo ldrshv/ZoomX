@@ -125,8 +125,9 @@ class Response extends modResponse
             }
         }
 
-        /* tell PHP to call _postProcess after returning the response (for caching) */
-        register_shutdown_function([$this->modx,"_postProcess"]);
+        /* tell PHP to call postProcess after returning the response (for caching) */
+        // MODX 3: modX::_postProcess() was renamed to public postProcess()
+        register_shutdown_function([$this->modx, 'postProcess']);
 
         if ($this->modx->resource instanceof modStaticResource && $this->contentType->get('binary')) {
             $this->modx->resource->process();

@@ -28,7 +28,7 @@ class CommandManager
     {
         [$alias, $method] = explode(':', $data);
         if (isset(self::$commands[$alias]) && class_exists(self::$commands[$alias])) {
-            return [new self::$commands[$alias](zoomx(modx::class)), $method];
+            return [new (self::$commands[$alias])(zoomx(\MODX\Revolution\modX::class)), $method];
         }
 
         return null;
