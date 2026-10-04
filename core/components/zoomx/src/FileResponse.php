@@ -1,8 +1,8 @@
 <?php
 namespace Zoomx;
 
-use xPDO\modx\modResponse;
-use xPDO\modx\modX;
+use MODX\Revolution\modResponse;
+use MODX\Revolution\modX;
 use SplFileInfo;
 use Zoomx\Support\Repository;
 use Zoomx\Exceptions\FileException;
@@ -22,8 +22,7 @@ class FileResponse extends modResponse
 
     private $mustBeParsed = false;
 
-
-    public function __construct(modX $modx, $file, $isAttachment = false, $deleteFileAfterSend = false) {
+public function __construct(modX $modx, $file, $isAttachment = false, $deleteFileAfterSend = false) {
         parent::__construct($modx);
 
         $this->setFile($file);

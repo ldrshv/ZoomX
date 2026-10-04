@@ -1,13 +1,16 @@
 <?php
 namespace Zoomx;
 
+use MODX\Revolution\modContextResource;
+
+use MODX\Revolution\modResourceGroupResource;
+
+use MODX\Revolution\modContentType;
+
 use xPDO;
+use MODX\Revolution\modX;
 use xPDO\Cache\xPDOCacheManager;
-use xPDO\modx\modX;
-use xPDO\modx\modResource;
-use xPDO\modx\modContentType;
-use xPDO\modx\modResourceGroupResource;
-use xPDO\modx\modContextResource;
+use MODX\Revolution\modResource;
 use Zoomx\DTO\Error as ErrorData;
 
 abstract class RequestHandler
@@ -16,8 +19,7 @@ abstract class RequestHandler
     /** @var modResource */
     public $resource;
 
-
-    public function __construct(modX $modx)
+public function __construct(modX $modx)
     {
         $this->modx = $modx;
         $this->initialize();

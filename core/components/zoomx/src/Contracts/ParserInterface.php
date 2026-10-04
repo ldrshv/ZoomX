@@ -1,10 +1,9 @@
 <?php
 namespace Zoomx\Contracts;
 
-use xPDO\modx\modResource;
+use MODX\Revolution\modResource;
 use SmartyException;
 use Zoomx\View;
-
 
 interface ParserInterface
 {

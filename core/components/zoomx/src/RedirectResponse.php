@@ -2,8 +2,8 @@
 namespace Zoomx;
 
 use InvalidArgumentException;
-use xPDO\modx\modResponse;
-use xPDO\modx\modX;
+use MODX\Revolution\modResponse;
+use MODX\Revolution\modX;
 use Zoomx\Support\Repository;
 
 class RedirectResponse extends modResponse

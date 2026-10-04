@@ -2,11 +2,12 @@
 
 namespace Zoomx;
 
-use xPDO\modx\modParser;
 use xPDO;
-use xPDO\modx\modX;
-use xPDO\modx\modRequest;
-use xPDO\modx\modResponse;
+
+use MODX\Revolution\modParser;
+use MODX\Revolution\modX;
+use MODX\Revolution\modRequest;
+use MODX\Revolution\modResponse;
 use Zoomx\Json\Response as JsonResponse;
 use Zoomx\Contracts\ParserInterface;
 use Zoomx\Support\ContentTypeDetector;
@@ -32,8 +33,7 @@ class Service
     /** @var array */
     private $exceptions = [];
 
-
-    /**
+/**
      * Service constructor.
      * @param modX $modx
      */
@@ -58,9 +58,8 @@ class Service
             $this->preparePdoToolsAdapter();
         }
 
-        // MODX 3: the modResponse/modRequest classes are now namespaced
-        // (xPDO\modx\modResponse) and are loaded by the xPDO autoloader,
-        // so no manual require of modresponse.class.php is needed anymore.
+        // Load modResponse class
+        
     }
 
     /**
@@ -186,6 +185,7 @@ class Service
     public function getRequest($class = null)
     {
         if (!isset($this->instances['request']) || (is_string($class) && !$this->request instanceof $class)) {
+            
             if (!class_exists('ZoomRequest')) {
                 class_alias(Request::class, 'ZoomRequest');
             }

@@ -2,15 +2,14 @@
 
 namespace Zoomx\Elements;
 
-use xPDO\modx\modX;
+use MODX\Revolution\modX;
 
 abstract class Snippet
 {
     /** @var modX $modx */
     protected $modx;
 
-
-    /**
+/**
      * @param modX $modx
      */
     public function __construct(modX $modx)

@@ -1,8 +1,8 @@
 <?php
 namespace Zoomx;
 
-use xPDO\modx\modX;
-use xPDO\modx\modResource;
+use MODX\Revolution\modX;
+use MODX\Revolution\modResource;
 
 class IdRequestHandler extends RequestHandler
 {

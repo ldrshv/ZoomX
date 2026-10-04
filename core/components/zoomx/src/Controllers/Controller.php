@@ -2,8 +2,7 @@
 
 namespace Zoomx\Controllers;
 
-
-use xPDO\modx\modX;
+use MODX\Revolution\modX;
 
 abstract class Controller
 {

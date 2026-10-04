@@ -1,7 +1,7 @@
 <?php
 namespace Zoomx\Support;
 
-use xPDO\modx\modX;
+use MODX\Revolution\modX;
 
 class ContentTypeDetector
 {
@@ -20,8 +20,7 @@ class ContentTypeDetector
         'xml' => 'text/xml',
     ];
 
-
-    public function __construct(modX $modx)
+public function __construct(modX $modx)
     {
         $this->modx = $modx;
     }

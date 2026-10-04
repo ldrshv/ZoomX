@@ -2,7 +2,7 @@
 
 namespace Zoomx\Elements;
 
-use xPDO\modx\modX;
+use MODX\Revolution\modX;
 
 abstract class Plugin
 {
@@ -15,8 +15,7 @@ abstract class Plugin
         //'OnHandleRequest' => -100, // Priority for the event.
     ];
 
-
-    /**
+/**
      * @param modX $modx
      */
     public function __construct(modX $modx)

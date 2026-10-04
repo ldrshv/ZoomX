@@ -2,9 +2,8 @@
 namespace Zoomx;
 
 use Error;
-use xPDO\modx\modX;
-use xPDO\modx\modResource;
-use xPDO\modx\modResponse;
+use MODX\Revolution\modResource;
+use MODX\Revolution\modResponse;
 use Zoomx\DTO\Error as ErrorData;
 use Zoomx\Exceptions\HttpException;
 use Zoomx\Exceptions\NotFoundHttpException;
@@ -93,8 +92,7 @@ class AliasRequestHandler extends RequestHandler
         return $this->getResourceByAlias($identifier, $context, $options);
     }
 
-
-    /**
+/**
      * @param string $uri
      * @param string $context
      * @param array $options
@@ -130,7 +128,7 @@ class AliasRequestHandler extends RequestHandler
             if (!$resourceId) {
                 $criteria = $this->modx->newQuery(modResource::class);
                 $criteria->where(['uri' => $uri, 'context_key' => $context, 'deleted' => 0]);
-                if ($this->modx->getSessionState() !== modX::SESSION_STATE_INITIALIZED || !$this->modx->hasPermission('view_unpublished')) {
+                if ($this->modx->getSessionState() !== \modX::SESSION_STATE_INITIALIZED || !$this->modx->hasPermission('view_unpublished')) {
                     $criteria->where(['published' => 1]);
                 }
                 $this->resource = $this->modx->getObject(modResource::class, $criteria);

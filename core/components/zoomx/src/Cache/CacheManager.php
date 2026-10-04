@@ -1,8 +1,8 @@
 <?php
 namespace Zoomx\Cache;
 
-use xPDO\modx\modCacheManager;
-use xPDO\modx\modX;
+use MODX\Revolution\modCacheManager;
+use MODX\Revolution\modX;
 use xPDO;
 use Closure;
 

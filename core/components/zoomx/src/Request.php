@@ -1,12 +1,11 @@
 <?php
 namespace Zoomx;
 
-use xPDO\modx\modDocument;
-use xPDO\modx\modX;
-use xPDO\modx\modRequest;
-use Zoomx\DTO\Error as ErrorData;
-use xPDO;
+use MODX\Revolution\modDocument;
 
+use MODX\Revolution\modX;
+use MODX\Revolution\modRequest;
+use Zoomx\DTO\Error as ErrorData;
 
 class Request extends modRequest
 {
@@ -118,8 +117,7 @@ class Request extends modRequest
         return $this->handler->getResource($identifier, $options);
     }
 
-
-    /**
+/**
      * @param bool $reload
      * @return RequestHandler
      */

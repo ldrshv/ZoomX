@@ -1,8 +1,8 @@
 <?php
 namespace Zoomx\Json;
 
-use xPDO\modx\modResponse;
-use xPDO\modx\modX;
+use MODX\Revolution\modResponse;
+use MODX\Revolution\modX;
 use Zoomx\Contracts\Json\ResponseInterface;
 use Zoomx\Support\Repository;
 
@@ -86,8 +86,7 @@ class Response extends modResponse implements ResponseInterface
         511 => 'Network Authentication Required',                             // RFC6585
     ];
 
-
-    /**
+/**
      * @param modX $modx A reference to the modX instance
      */
     public function __construct(modX $modx)

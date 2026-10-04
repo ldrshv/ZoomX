@@ -2,15 +2,24 @@
 
 namespace Zoomx\Support;
 
-use xPDO\modx\modX, xPDO;
-use xPDO\modx\modChunk;
-use xPDO\modx\modElement;
-use xPDO\modx\modElementProperty;
-use xPDO\modx\modNamespace;
-use xPDO\modx\modPlugin;
-use xPDO\modx\modPluginEvent;
-use xPDO\modx\modPropertySet;
-use xPDO\modx\modSnippet;
+use MODX\Revolution\modPlugin;
+
+use MODX\Revolution\modPluginEvent;
+
+use MODX\Revolution\modPropertySet;
+
+use MODX\Revolution\modMediaSource;
+
+use MODX\Revolution\modSnippet;
+
+use MODX\Revolution\modChunk;
+
+use MODX\Revolution\modX;
+
+use xPDO;
+
+use MODX\Revolution\modElement;
+use MODX\Revolution\modNamespace;
 use SmartyException;
 use ReflectionException;
 
@@ -363,9 +372,6 @@ final class ElementService
     /**
      * Get a modElement instance taking advantage of the modX::$sourceCache.
      *
-     * MODX 3: xPDO::getObjectGraph() was removed, so the graph is assembled
-     * with two queries: the element itself and its Source.
-     *
      * @param string $class The modElement derivative class to load.
      * @param string $name An element name or raw tagName to identify the modElement instance.
      * @return modElement|null An instance of the specified modElement derivative class.
@@ -380,30 +386,26 @@ final class ElementService
 
             if (!empty($this->modx->sourceCache[$class][$name]['source']) && !empty($this->modx->sourceCache[$class][$name]['source']['class_key'])) {
                 $sourceClassKey = $this->modx->sourceCache[$class][$name]['source']['class_key'];
-                /* @var \xPDO\modx\modMediaSource $source */
+                
+                /* @var \modMediaSource $source */
                 $source = $this->modx->newObject($sourceClassKey);
                 $source->fromArray($this->modx->sourceCache[$class][$name]['source'], '', true, true);
                 $element->addOne($source, 'Source');
             }
         } else {
             /** @var modElement $element */
-            $element = $this->modx->getObject($class, ['name' => $name], true);
-            if ($element) {
-                $source = $element->getOne('Source');
-                if ($source) {
-                    $element->addOne($source, 'Source');
-                }
-                if (isset($this->modx->sourceCache[$class])) {
-                    $this->modx->sourceCache[$class][$name] = [
-                        'fields' => $element->toArray(),
-                        'policies' => $element->getPolicies(),
-                        'source' => $element->Source ? $element->Source->toArray() : [],
-                    ];
-                }
+            $element = $this->modx->getObject($class, ['name' => $name]);
+            if ($element) { $element->getOne('Source'); }
+            if ($element && isset($this->modx->sourceCache[$class])) {
+                $this->modx->sourceCache[$class][$name] = [
+                    'fields' => $element->toArray(),
+                    'policies' => $element->getPolicies(),
+                    'source' => $element->Source ? $element->Source->toArray() : [],
+                ];
             }
         }
 
-        return $element ?? null;
+        return $element;
     }
 
     /**
@@ -567,7 +569,7 @@ final class ElementService
             'locked' => 0,
             'disabled' => false,
             'properties' => null,
-            moduleguid::class => '',
+            'moduleguid' => '',
             'static' => 0,
             'static_file' => '',
         ];
@@ -620,20 +622,21 @@ final class ElementService
     /**
      * @param modElement $element
      * @param string $name
-     * @return \xPDO\modx\modPropertySet|object|null
+     * @return \modPropertySet|object|null
      */
     private function loadPropertySet(modElement $element, string $name)
     {
-        // MODX 3: xPDO::getObjectGraph() was removed, use a JOIN query instead.
+        // MODX 3: xPDO::getObjectGraph() was removed, using an explicit query instead
         $query = $this->modx->newQuery(modPropertySet::class);
-        $query->innerJoin(modElementProperty::class, 'Elements');
-        $query->where([
-            'Elements.element' => $element->id,
+        $query->innerJoin('Elements', 'Elements', [
+            'Elements.element' => $element->get('id'),
             'Elements.element_class' => $element->_class,
-            '\\modPropertySet.name' => $name,
         ]);
+        $query->where(['name' => $name]);
+        $query->limit(1);
+        $obj = $this->modx->getObject($query);
 
-        return $this->modx->getObject(modPropertySet::class, $query);
+        return $obj;
     }
 
     /**
@@ -703,7 +706,7 @@ final class ElementService
      */
     private function getValidFilename($name)
     {
-        $ext = zoomx(modx::class)->getOption('zoomx_template_extension', null, 'tpl');
+        $ext = zoomx('modx')->getOption('zoomx_template_extension', null, 'tpl');
         if ($ext !== pathinfo($name, PATHINFO_EXTENSION)) {
             $name .= ".$ext";
         }

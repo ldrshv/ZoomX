@@ -1,12 +1,15 @@
 <?php
 namespace Zoomx;
 
-use xPDO\modx\modResponse;
-use xPDO\modx\modStaticResource;
 use xPDO;
-use xPDO\modx\modX;
-use xPDO\modx\modDocument;
-use xPDO\modx\modContentType;
+
+use MODX\Revolution\modContentType;
+
+use MODX\Revolution\modDocument;
+
+use MODX\Revolution\modResponse;
+use MODX\Revolution\modStaticResource;
+use MODX\Revolution\modX;
 
 class Response extends modResponse
 {

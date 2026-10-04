@@ -2,9 +2,10 @@
 
 namespace Zoomx;
 
-use Error;
 use xPDO;
-use xPDO\modx\modX;
+
+use Error;
+use MODX\Revolution\modX;
 use Throwable;
 use Zoomx\DTO\Error as ErrorData;
 use Zoomx\Exceptions\HttpException;

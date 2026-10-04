@@ -32,15 +32,7 @@ function smarty_modifier_userinfo($id, $field = null)
     }
 
     $appEnv = getenv('APP_ENV', true) ?? 'prod';
-    if ($appEnv === 'test') {
-        $user = $modx->user;
-    } else {
-        // MODX 3: xPDO::getObjectGraph() was removed, load the profile relation separately
-        $user = $modx->getObject(\xPDO\modx\modUser::class, ['modUser.id' => (int)$id]);
-        if ($user) {
-            $user->getOne('Profile');
-        }
-    }
+    $user = $appEnv === 'test' ? $modx->user : $user = $modx->getObjectGraph('\MODX\Revolution\modUser', '{"Profile":{}}', ['\MODX\Revolution\modUser.id' => (int)$id]);
     if (!$user) {
         return '';
     }

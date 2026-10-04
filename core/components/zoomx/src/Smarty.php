@@ -1,11 +1,12 @@
 <?php
 namespace Zoomx;
 
-use xPDO\modx\modResource;
-use xPDO\modx\modTemplate;
-use Smarty as BaseSmarty;
 use xPDO;
-use xPDO\modx\modX;
+
+use MODX\Revolution\modResource;
+use MODX\Revolution\modTemplate;
+use Smarty as BaseSmarty;
+use MODX\Revolution\modX;
 
 class Smarty extends BaseSmarty implements Contracts\ParserInterface
 {
@@ -67,7 +68,7 @@ class Smarty extends BaseSmarty implements Contracts\ParserInterface
 
         // Get available $modx object in the templates
         if ($modx->getOption('zoomx_include_modx', null, true)) {
-            $this->assign(modx::class, $modx, true);
+            $this->assign('modx', $modx, true);
             $this->assign('zoomx', $zoomService, true);
         }
 
@@ -102,7 +103,7 @@ class Smarty extends BaseSmarty implements Contracts\ParserInterface
     {
         $preFilters = ['scripts', 'ignore', 'include'];
         if ($this->modx->getOption('zoomx_modx_tag_syntax', null, true)) {
-            $preFilters[] = modxtags::class;
+            $preFilters[] = 'modxtags';
         }
 
         foreach ($preFilters as $filter) {
