@@ -10,7 +10,7 @@ if ($modx->event->name === 'OnMODXInit') {
 try {
     $parser = parserx();
 } catch (Throwable $e) {
-    $modx->log(modX::LOG_LEVEL_ERROR, $e->getMessage());
+    $modx->log(\xPDO::LOG_LEVEL_ERROR, $e->getMessage());
     return;
 }
 

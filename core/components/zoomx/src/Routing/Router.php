@@ -5,7 +5,7 @@ namespace Zoomx\Routing;
 
 use FastRoute\Dispatcher;
 use Zoomx\Service;
-use modX;
+use xPDO\modx\modX;
 
 use function FastRoute\cachedDispatcher;
 

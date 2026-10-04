@@ -1,8 +1,8 @@
 <?php
 namespace Zoomx\Json;
 
-use modX;
-use modRequest;
+use xPDO\modx\modX;
+use xPDO\modx\modRequest;
 use Zoomx\Exceptions\ServiceUnavailableHttpException;
 use Zoomx\Service;
 

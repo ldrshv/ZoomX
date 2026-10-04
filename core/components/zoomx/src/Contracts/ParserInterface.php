@@ -1,7 +1,7 @@
 <?php
 namespace Zoomx\Contracts;
 
-use modResource;
+use xPDO\modx\modResource;
 use SmartyException;
 use Zoomx\View;
 

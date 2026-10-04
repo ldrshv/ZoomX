@@ -2,9 +2,15 @@
 
 namespace Zoomx\Support;
 
-use modX, xPDO;
-use modElement;
-use modNamespace;
+use xPDO\modx\modX, xPDO;
+use xPDO\modx\modChunk;
+use xPDO\modx\modElement;
+use xPDO\modx\modElementProperty;
+use xPDO\modx\modNamespace;
+use xPDO\modx\modPlugin;
+use xPDO\modx\modPluginEvent;
+use xPDO\modx\modPropertySet;
+use xPDO\modx\modSnippet;
 use SmartyException;
 use ReflectionException;
 
@@ -91,13 +97,13 @@ final class ElementService
             $content = preg_replace('#^@INLINE:?\s+#', '', $name);
             $name = 'INLINE_' . md5($content);
             if (!$chunk = $this->chunkRepository->get($name)) {
-                $chunk = $this->modx->newObject('modChunk', [
+                $chunk = $this->modx->newObject(modChunk::class, [
                     'id' => 0,
                     'name' => $name,
                     'content' => $content,
                 ]);
             }
-            //$this->modx->sourceCache['modChunk'][$name] = ['fields' => $chunk->toArray(), 'policies' => []];
+            //$this->modx->sourceCache[modChunk::class][$name] = ['fields' => $chunk->toArray(), 'policies' => []];
         } elseif (strpos($name, '@FILE') === 0 ) {
             $name = ltrim($this->sanitizePath(preg_replace('#^@FILE:?\s+#', '', $name)), '/\\');
             $isFile = true;
@@ -108,7 +114,7 @@ final class ElementService
             }
             if (!$chunk = $this->chunkRepository->get($name)) {
                 /** @var \modChunk $chunk */
-                $chunk = $this->getElement('modChunk', $name);
+                $chunk = $this->getElement(modChunk::class, $name);
                 if (is_null($chunk)) {
                     if (getenv("APP_ENV") !== "test") {
                         $this->modx->log(xPDO::LOG_LEVEL_ERROR, $this->modx->lexicon('zoomx_chunk_not_found', ['name' => $name]));
@@ -175,7 +181,7 @@ final class ElementService
         $name = trim($name);
         if (empty($name)) {
             if (getenv("APP_ENV") !== "test") {
-                $this->modx->log(MODX_LOG_LEVEL_ERROR, $this->modx->lexicon('zoomx_snippet_not_found', ['name' => $name]));
+                $this->modx->log(xPDO::LOG_LEVEL_ERROR, $this->modx->lexicon('zoomx_snippet_not_found', ['name' => $name]));
             }
             return false;
         }
@@ -186,10 +192,10 @@ final class ElementService
         }
         if (!$snippet = $this->snippetRepository->get($name)) {
             /** @var \modSnippet $snippet */
-            $snippet = $this->getElement('modSnippet', $name);
+            $snippet = $this->getElement(modSnippet::class, $name);
             if (is_null($snippet)) {
                 if (getenv("APP_ENV") !== "test") {
-                    $this->modx->log(MODX_LOG_LEVEL_ERROR, $this->modx->lexicon('zoomx_snippet_not_found', ['name' => $name]));
+                    $this->modx->log(xPDO::LOG_LEVEL_ERROR, $this->modx->lexicon('zoomx_snippet_not_found', ['name' => $name]));
                 }
                 return false;
             }
@@ -239,7 +245,7 @@ final class ElementService
         $file = $this->findSnippetFile($name);
         if (null === $file) {
             if (getenv("APP_ENV") !== "test") {
-                $this->modx->log(MODX_LOG_LEVEL_ERROR, $this->modx->lexicon('zoomx_snippet_file_not_found', ['name' => $name]));
+                $this->modx->log(xPDO::LOG_LEVEL_ERROR, $this->modx->lexicon('zoomx_snippet_file_not_found', ['name' => $name]));
             }
             return false;
         }
@@ -357,6 +363,9 @@ final class ElementService
     /**
      * Get a modElement instance taking advantage of the modX::$sourceCache.
      *
+     * MODX 3: xPDO::getObjectGraph() was removed, so the graph is assembled
+     * with two queries: the element itself and its Source.
+     *
      * @param string $class The modElement derivative class to load.
      * @param string $name An element name or raw tagName to identify the modElement instance.
      * @return modElement|null An instance of the specified modElement derivative class.
@@ -371,25 +380,30 @@ final class ElementService
 
             if (!empty($this->modx->sourceCache[$class][$name]['source']) && !empty($this->modx->sourceCache[$class][$name]['source']['class_key'])) {
                 $sourceClassKey = $this->modx->sourceCache[$class][$name]['source']['class_key'];
-                $this->modx->loadClass('sources.modMediaSource');
-                /* @var \modMediaSource $source */
+                /* @var \xPDO\modx\modMediaSource $source */
                 $source = $this->modx->newObject($sourceClassKey);
                 $source->fromArray($this->modx->sourceCache[$class][$name]['source'], '', true, true);
                 $element->addOne($source, 'Source');
             }
         } else {
             /** @var modElement $element */
-            $element = $this->modx->getObjectGraph($class, ['Source' => []], ['name' => $name], true);
-            if ($element && isset($this->modx->sourceCache[$class])) {
-                $this->modx->sourceCache[$class][$name] = [
-                    'fields' => $element->toArray(),
-                    'policies' => $element->getPolicies(),
-                    'source' => $element->Source ? $element->Source->toArray() : [],
-                ];
+            $element = $this->modx->getObject($class, ['name' => $name], true);
+            if ($element) {
+                $source = $element->getOne('Source');
+                if ($source) {
+                    $element->addOne($source, 'Source');
+                }
+                if (isset($this->modx->sourceCache[$class])) {
+                    $this->modx->sourceCache[$class][$name] = [
+                        'fields' => $element->toArray(),
+                        'policies' => $element->getPolicies(),
+                        'source' => $element->Source ? $element->Source->toArray() : [],
+                    ];
+                }
             }
         }
 
-        return $element;
+        return $element ?? null;
     }
 
     /**
@@ -487,7 +501,7 @@ final class ElementService
             foreach ($classes as $class) {
                 if (!class_exists($class)) {
                     if (getenv("APP_ENV") !== "test") {
-                        $this->modx->log(MODX_LOG_LEVEL_ERROR, "Plugin class \"$class\" not found.");
+                        $this->modx->log(xPDO::LOG_LEVEL_ERROR, "Plugin class \"$class\" not found.");
                     }
                     continue;
                 }
@@ -553,7 +567,7 @@ final class ElementService
             'locked' => 0,
             'disabled' => false,
             'properties' => null,
-            'moduleguid' => '',
+            moduleguid::class => '',
             'static' => 0,
             'static_file' => '',
         ];
@@ -606,17 +620,20 @@ final class ElementService
     /**
      * @param modElement $element
      * @param string $name
-     * @return \modPropertySet|object|null
+     * @return \xPDO\modx\modPropertySet|object|null
      */
     private function loadPropertySet(modElement $element, string $name)
     {
-        $obj = $this->modx->getObjectGraph('modPropertySet', '{"Elements":{}}', [
+        // MODX 3: xPDO::getObjectGraph() was removed, use a JOIN query instead.
+        $query = $this->modx->newQuery(modPropertySet::class);
+        $query->innerJoin(modElementProperty::class, 'Elements');
+        $query->where([
             'Elements.element' => $element->id,
             'Elements.element_class' => $element->_class,
-            'modPropertySet.name' => $name
+            '\\modPropertySet.name' => $name,
         ]);
 
-        return $obj;
+        return $this->modx->getObject(modPropertySet::class, $query);
     }
 
     /**
@@ -662,10 +679,10 @@ final class ElementService
      */
     private function getPluginPriorities(array $events): array
     {
-        $query = $this->modx->newQuery('modPluginEvent');
+        $query = $this->modx->newQuery(modPluginEvent::class);
         $query->setClassAlias('Event');
         $query->select('Event.pluginid,Event.event,Event.priority');
-        $query->innerJoin('modPlugin', 'Plugin');
+        $query->innerJoin(modPlugin::class, 'Plugin');
         $query->where([
             'Plugin.disabled' => 0,
             'Event.event:IN' => array_keys($events),
@@ -686,7 +703,7 @@ final class ElementService
      */
     private function getValidFilename($name)
     {
-        $ext = zoomx('modx')->getOption('zoomx_template_extension', null, 'tpl');
+        $ext = zoomx(modx::class)->getOption('zoomx_template_extension', null, 'tpl');
         if ($ext !== pathinfo($name, PATHINFO_EXTENSION)) {
             $name .= ".$ext";
         }

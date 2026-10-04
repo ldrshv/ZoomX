@@ -3,7 +3,8 @@
 namespace Zoomx;
 
 use Error;
-use modX;
+use xPDO;
+use xPDO\modx\modX;
 use Throwable;
 use Zoomx\DTO\Error as ErrorData;
 use Zoomx\Exceptions\HttpException;
@@ -31,7 +32,7 @@ class ExceptionHandler
         ];
         if ($e instanceof Error || $code >= 500) {
             $errorType = get_class($e);
-            $this->modx->log(MODX_LOG_LEVEL_ERROR, "[$errorType] " . $e->getMessage(), '', '', $e->getFile(), $e->getLine());
+            $this->modx->log(xPDO::LOG_LEVEL_ERROR, "[$errorType] " . $e->getMessage(), '', '', $e->getFile(), $e->getLine());
         }
 
         $error = new ErrorData($data);

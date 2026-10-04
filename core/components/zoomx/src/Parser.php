@@ -1,7 +1,7 @@
 <?php
 namespace Zoomx;
 
-use modParser;
+use xPDO\modx\modParser;
 
 class Parser extends modParser
 {

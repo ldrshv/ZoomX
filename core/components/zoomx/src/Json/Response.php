@@ -1,8 +1,8 @@
 <?php
 namespace Zoomx\Json;
 
-use modResponse;
-use modX;
+use xPDO\modx\modResponse;
+use xPDO\modx\modX;
 use Zoomx\Contracts\Json\ResponseInterface;
 use Zoomx\Support\Repository;
 

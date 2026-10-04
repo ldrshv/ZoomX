@@ -2,10 +2,11 @@
 
 namespace Zoomx;
 
-use modParser;
-use modX;
-use modRequest;
-use modResponse;
+use xPDO\modx\modParser;
+use xPDO;
+use xPDO\modx\modX;
+use xPDO\modx\modRequest;
+use xPDO\modx\modResponse;
 use Zoomx\Json\Response as JsonResponse;
 use Zoomx\Contracts\ParserInterface;
 use Zoomx\Support\ContentTypeDetector;
@@ -57,10 +58,9 @@ class Service
             $this->preparePdoToolsAdapter();
         }
 
-        // Load modResponse class
-        if (!class_exists('modResponse')) {
-            require_once  MODX_CORE_PATH . 'model/modx/modresponse.class.php';
-        }
+        // MODX 3: the modResponse/modRequest classes are now namespaced
+        // (xPDO\modx\modResponse) and are loaded by the xPDO autoloader,
+        // so no manual require of modresponse.class.php is needed anymore.
     }
 
     /**
@@ -186,9 +186,6 @@ class Service
     public function getRequest($class = null)
     {
         if (!isset($this->instances['request']) || (is_string($class) && !$this->request instanceof $class)) {
-            if (!class_exists('modRequest')) {
-                require MODX_CORE_PATH . 'model/modx/modrequest.class.php';
-            }
             if (!class_exists('ZoomRequest')) {
                 class_alias(Request::class, 'ZoomRequest');
             }
@@ -586,13 +583,13 @@ class Service
             $this->modx->setOption('pdoTools.class', 'pdoToolsZoomx');
             $this->modx->setOption('pdotools_class_path', $corePath . 'pdotools/');
         } else {
-            $this->modx->log(\modX::LOG_LEVEL_ERROR, '[pdoToolsZoomx] pdoTools class is not found.');
+            $this->modx->log(xPDO::LOG_LEVEL_ERROR, '[pdoToolsZoomx] pdoTools class is not found.');
         }
         if (class_exists('pdoFetch')) {
             $this->modx->setOption('pdoFetch.class', 'pdoFetchZoomx');
             $this->modx->setOption('pdofetch_class_path', $corePath . 'pdotools/');
         } else {
-            $this->modx->log(\modX::LOG_LEVEL_ERROR, '[pdoFetchZoomx] pdoFetch class is not found.');
+            $this->modx->log(xPDO::LOG_LEVEL_ERROR, '[pdoFetchZoomx] pdoFetch class is not found.');
         }
         include $corePath . 'pdotools/pdotoolsadapter.php';
     }

@@ -1,9 +1,12 @@
 <?php
 namespace Zoomx;
 
-use modResponse;
-use modStaticResource;
-use modX;
+use xPDO\modx\modResponse;
+use xPDO\modx\modStaticResource;
+use xPDO;
+use xPDO\modx\modX;
+use xPDO\modx\modDocument;
+use xPDO\modx\modContentType;
 
 class Response extends modResponse
 {
@@ -12,15 +15,15 @@ class Response extends modResponse
      */
     public function outputContent(array $options = array())
     {
-        $this->modx->resource = $this->modx->resource ?? $this->modx->newObject('modDocument', ['content_type' => 0]);
+        $this->modx->resource = $this->modx->resource ?? $this->modx->newObject(modDocument::class, ['content_type' => 0]);
         if ($this->modx->resource->content_type === 0) {
             $this->contentType = $this->getContentType();
         }
         if ($this->contentType === null && !($this->contentType = $this->modx->resource->getOne('ContentType'))) {
             if ($this->modx->getDebug() === true) {
-                $this->modx->log(modX::LOG_LEVEL_DEBUG, "No valid content type for the resource: " . print_r($this->modx->resource->toArray(), true));
+                $this->modx->log(xPDO::LOG_LEVEL_DEBUG, "No valid content type for the resource: " . print_r($this->modx->resource->toArray(), true));
             }
-            $this->modx->log(modX::LOG_LEVEL_FATAL, "The requested resource has no valid content type specified.");
+            $this->modx->log(xPDO::LOG_LEVEL_FATAL, "The requested resource has no valid content type specified.");
             abortx(500, 'The requested resource has no valid content type specified.');
         }
 
@@ -170,7 +173,7 @@ class Response extends modResponse
             $mimeType = zoomx()->getContentTypeDetector()->detect('text/html');
         }
 
-        return $this->modx->getObject('modContentType', ['mime_type' => $mimeType]);
+        return $this->modx->getObject(modContentType::class, ['mime_type' => $mimeType]);
     }
 
     private function checkHeaderList()

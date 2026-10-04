@@ -3,7 +3,7 @@
 namespace Zoomx\Commands;
 
 
-use modX;
+use xPDO\modx\modX;
 
 abstract class Command
 {

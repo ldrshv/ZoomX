@@ -2,7 +2,7 @@
 
 namespace Zoomx\Elements;
 
-use modX;
+use xPDO\modx\modX;
 
 abstract class Plugin
 {

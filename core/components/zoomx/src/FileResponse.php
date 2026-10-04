@@ -1,8 +1,8 @@
 <?php
 namespace Zoomx;
 
-use modResponse;
-use modX;
+use xPDO\modx\modResponse;
+use xPDO\modx\modX;
 use SplFileInfo;
 use Zoomx\Support\Repository;
 use Zoomx\Exceptions\FileException;

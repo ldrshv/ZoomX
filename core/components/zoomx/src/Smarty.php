@@ -1,10 +1,11 @@
 <?php
 namespace Zoomx;
 
-use modResource;
-use modTemplate;
+use xPDO\modx\modResource;
+use xPDO\modx\modTemplate;
 use Smarty as BaseSmarty;
-use modX;
+use xPDO;
+use xPDO\modx\modX;
 
 class Smarty extends BaseSmarty implements Contracts\ParserInterface
 {
@@ -66,7 +67,7 @@ class Smarty extends BaseSmarty implements Contracts\ParserInterface
 
         // Get available $modx object in the templates
         if ($modx->getOption('zoomx_include_modx', null, true)) {
-            $this->assign('modx', $modx, true);
+            $this->assign(modx::class, $modx, true);
             $this->assign('zoomx', $zoomService, true);
         }
 
@@ -89,7 +90,7 @@ class Smarty extends BaseSmarty implements Contracts\ParserInterface
         if ($securityClass = $this->modx->getOption('zoomx_smarty_security_class', null, '')) {
             $FQN = $corePath . "smarty/security/$securityClass.php";
             if (!file_exists($FQN)) {
-                $this->modx->log(MODX_LOG_LEVEL_ERROR, "Class $securityClass not found.");
+                $this->modx->log(xPDO::LOG_LEVEL_ERROR, "Class $securityClass not found.");
             } else {
                 include $FQN;
             }
@@ -101,7 +102,7 @@ class Smarty extends BaseSmarty implements Contracts\ParserInterface
     {
         $preFilters = ['scripts', 'ignore', 'include'];
         if ($this->modx->getOption('zoomx_modx_tag_syntax', null, true)) {
-            $preFilters[] = 'modxtags';
+            $preFilters[] = modxtags::class;
         }
 
         foreach ($preFilters as $filter) {
@@ -150,7 +151,7 @@ class Smarty extends BaseSmarty implements Contracts\ParserInterface
         } elseif ($this->tpl->hasContent()) {
             $output = $this->tpl->content;
         } else {
-            $this->modx->log(modX::LOG_LEVEL_ERROR, $this->modx->lexicon('zoomx_template_not_found', ['name' => $this->tpl]));
+            $this->modx->log(xPDO::LOG_LEVEL_ERROR, $this->modx->lexicon('zoomx_template_not_found', ['name' => $this->tpl]));
         }
         if (isset($resource)) {
             $resource->setProcessed(true);

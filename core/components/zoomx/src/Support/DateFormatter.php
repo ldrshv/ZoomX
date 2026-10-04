@@ -3,7 +3,7 @@
 namespace Zoomx\Support;
 
 
-use modX;
+use xPDO\modx\modX;
 
 class DateFormatter
 {

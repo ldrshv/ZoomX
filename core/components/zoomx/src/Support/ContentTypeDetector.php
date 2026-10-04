@@ -1,7 +1,7 @@
 <?php
 namespace Zoomx\Support;
 
-use modX;
+use xPDO\modx\modX;
 
 class ContentTypeDetector
 {
