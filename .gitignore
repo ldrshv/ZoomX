@@ -1,1 +1,2 @@
-(empty)
+# Python build artifacts
+*.whl
